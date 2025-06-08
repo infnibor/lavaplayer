@@ -1,7 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
-import com.vanniktech.maven.publish.SonatypeHost
 import org.ajoberstar.grgit.Grgit
 
 plugins {
@@ -42,10 +41,11 @@ subprojects {
             configure<PublishingExtension> {
                 val mavenUsername = findProperty("MAVEN_USERNAME") as String?
                 val mavenPassword = findProperty("MAVEN_PASSWORD") as String?
+
                 if (!mavenUsername.isNullOrEmpty() && !mavenPassword.isNullOrEmpty()) {
                     repositories {
-                        val snapshots = "https://maven.lavalink.dev/snapshots"
-                        val releases = "https://maven.lavalink.dev/releases"
+                        val snapshots = "https://maven.pcreators.pl/snapshots"
+                        val releases = "https://maven.pcreators.pl/releases"
 
                         maven(if (release) releases else snapshots) {
                             credentials {
@@ -55,22 +55,12 @@ subprojects {
                         }
                     }
                 } else {
-                    logger.lifecycle("Not publishing to maven.lavalink.dev because credentials are not set")
+                    logger.lifecycle("Not publishing because credentials are not set")
                 }
             }
 
             configure<MavenPublishBaseExtension> {
                 coordinates(group.toString(), project.the<BasePluginExtension>().archivesName.get(), version.toString())
-                val mavenCentralUsername = findProperty("mavenCentralUsername") as String?
-                val mavenCentralPassword = findProperty("mavenCentralPassword") as String?
-                if (!mavenCentralUsername.isNullOrEmpty() && !mavenCentralPassword.isNullOrEmpty()) {
-                    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, false)
-                    if (release) {
-                        signAllPublications()
-                    }
-                } else {
-                    logger.lifecycle("Not publishing to OSSRH due to missing credentials")
-                }
 
                 pom {
                     name = "lavaplayer"
